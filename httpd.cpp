@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 #include "msgstruct.h"
@@ -65,7 +67,27 @@ int httpd::req_handler(void * cls,
 	*ptr = nullptr;
 
 	std::string str;
-	if(strcasecmp(url, "/style.css") == 0)
+	if(strcasecmp(url, "/") == 0 || strcasecmp(url, "/index.html") == 0)
+	{
+		std::ifstream file("index.html");
+		if(file.good())
+		{
+			std::ostringstream buffer;
+			buffer << file.rdbuf();
+			str = buffer.str();
+			rsp = MHD_create_response_from_buffer(str.size(), (void*)str.c_str(), MHD_RESPMEM_MUST_COPY);
+			MHD_add_response_header(rsp, "Content-Type", "text/html; charset=utf-8");
+		}
+		else
+		{
+			static const char* not_found = "Not Found";
+			rsp = MHD_create_response_from_buffer(strlen(not_found), (void*)not_found, MHD_RESPMEM_PERSISTENT);
+			int ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, rsp);
+			MHD_destroy_response(rsp);
+			return ret;
+		}
+	}
+	else if(strcasecmp(url, "/style.css") == 0)
 	{
 		const char* req_etag = MHD_lookup_connection_value(connection, MHD_HEADER_KIND, "If-None-Match");
 
@@ -150,4 +172,3 @@ bool httpd::start_daemon()
 }
 
 #endif
-

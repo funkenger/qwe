@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tigre Brasil Cafe</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #fff7f1;
+        --card: #ffffff;
+        --primary: #2f160d;
+        --accent: #ff7a18;
+        --muted: #7b5a4b;
+        --shadow: 0 10px 30px rgba(47, 22, 13, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--primary);
+      }
+
+      header {
+        padding: 24px 20px 8px;
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        letter-spacing: 0.6px;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .btn {
+        border: none;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: var(--primary);
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+      }
+
+      .btn--outline {
+        background: #fff;
+        color: var(--primary);
+        border: 1px solid rgba(47, 22, 13, 0.2);
+      }
+
+      main {
+        padding: 16px 16px 120px;
+      }
+
+      .section-title {
+        font-size: 20px;
+        margin: 24px 0 12px;
+      }
+
+      .menu-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .card img {
+        width: 100%;
+        border-radius: 14px;
+        height: 170px;
+        object-fit: cover;
+        background: #f7ede7;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 10px 0 12px;
+      }
+
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .price {
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .add-btn {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .floating-cart {
+        position: fixed;
+        right: 16px;
+        bottom: 18px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 999px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--shadow);
+        z-index: 10;
+        cursor: pointer;
+      }
+
+      .cart-count {
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+      }
+
+      .info-block {
+        background: #fff;
+        border-radius: 18px;
+        padding: 16px;
+        margin-top: 28px;
+        box-shadow: var(--shadow);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(47, 22, 13, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 20;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: var(--shadow);
+      }
+
+      .modal-content h3 {
+        margin: 0 0 8px;
+      }
+
+      .close-btn {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        cursor: pointer;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .cart-list {
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 12px;
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      select,
+      input[type="date"],
+      input[type="time"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border-radius: 12px;
+        border: 1px solid #e4d6cf;
+        font-size: 14px;
+      }
+
+      .reservation-result {
+        margin-top: 12px;
+        background: #f9efe9;
+        padding: 10px;
+        border-radius: 12px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Tigre Brasil Cafe</h1>
+      <p>Sabores brasileiros feitos com carinho, em um espaço acolhedor.</p>
+      <div class="actions">
+        <button class="btn" id="open-reservation">Reservar mesa</button>
+        <button class="btn btn--outline" id="open-cart-top">Ver carrinho</button>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <h2 class="section-title">A) Menu</h2>
+        <div class="menu-list" id="menu-list"></div>
+      </section>
+
+      <div class="info-block">
+        <strong>Feito para Sentir</strong><br />
+        De Seg a Sex das 7h30 às 18h30<br />
+        Sáb e Dom das 8h às 12h<br />
+        Cardápio e pedidos 👇🏻<br />
+        Rua Euclides da Cunha, 1133, Sala 2, Campo Grande 79020230
+      </div>
+    </main>
+
+    <div class="floating-cart" id="floating-cart">
+      🧺 Carrinho <span class="cart-count" id="cart-count">0</span>
+    </div>
+
+    <div class="modal" id="cart-modal" aria-hidden="true">
+      <div class="modal-content">
+        <button class="close-btn" data-close="cart-modal">×</button>
+        <h3>Seu pedido no salão</h3>
+        <p>Escolha uma mesa de 1 a 15 e finalize o pedido.</p>
+        <label for="table-select">Mesa</label>
+        <select id="table-select"></select>
+        <div class="cart-list" id="cart-list"></div>
+        <div class="cart-item">
+          <strong>Total</strong>
+          <strong id="cart-total">R$ 0,00</strong>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="place-order">Fazer pedido</button>
+          <button class="btn btn--outline" data-close="cart-modal">Continuar escolhendo</button>
+        </div>
+        <div class="reservation-result" id="order-result" hidden></div>
+      </div>
+    </div>
+
+    <div class="modal" id="reservation-modal" aria-hidden="true">
+      <div class="modal-content">
+        <button class="close-btn" data-close="reservation-modal">×</button>
+        <h3>Reserva de mesa</h3>
+        <p>Escolha a data e o horário preferidos para sua visita.</p>
+        <label for="reservation-date">Data</label>
+        <input type="date" id="reservation-date" />
+        <label for="reservation-time">Hora</label>
+        <input type="time" id="reservation-time" />
+        <div class="modal-actions">
+          <button class="btn" id="confirm-reservation">Reservar</button>
+          <button class="btn btn--outline" data-close="reservation-modal">Fechar</button>
+        </div>
+        <div class="reservation-result" id="reservation-result" hidden></div>
+      </div>
+    </div>
+
+    <script>
+      const createImageData = (name, category) => {
+        const palettes = {
+          Snacks: {
+            bg: ["#fbe6d3", "#f4b58b"],
+            plate: "#ffffff",
+            food: ["#e18a5b", "#f5c16c", "#d96b4e"],
+          },
+          Hot: {
+            bg: ["#f7d8c7", "#f29b7a"],
+            plate: "#fff7f2",
+            food: ["#d56b3b", "#f2b25c", "#a84b2c"],
+          },
+          Drinks: {
+            bg: ["#d6efff", "#91c9ff"],
+            plate: "#f8fcff",
+            food: ["#8cc2ff", "#f2d3a0", "#6aa8d8"],
+          },
+        };
+        const palette = palettes[category] || palettes.Snacks;
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+            <defs>
+              <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="${palette.bg[0]}" />
+                <stop offset="100%" stop-color="${palette.bg[1]}" />
+              </linearGradient>
+              <radialGradient id="plate" cx="50%" cy="45%" r="45%">
+                <stop offset="0%" stop-color="${palette.plate}" />
+                <stop offset="100%" stop-color="#f0e6df" />
+              </radialGradient>
+              <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#2f160d" flood-opacity="0.18" />
+              </filter>
+              <filter id="grain" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" />
+                <feColorMatrix type="saturate" values="0.2" />
+                <feComponentTransfer>
+                  <feFuncA type="table" tableValues="0 0.15" />
+                </feComponentTransfer>
+              </filter>
+            </defs>
+            <rect width="600" height="400" rx="32" fill="url(#bg)" />
+            <g filter="url(#softShadow)">
+              <ellipse cx="300" cy="210" rx="170" ry="115" fill="url(#plate)" />
+            </g>
+            <g opacity="0.95">
+              <ellipse cx="300" cy="210" rx="125" ry="80" fill="${palette.food[0]}" />
+              <ellipse cx="250" cy="190" rx="60" ry="40" fill="${palette.food[1]}" />
+              <ellipse cx="355" cy="225" rx="70" ry="48" fill="${palette.food[2]}" />
+              <ellipse cx="300" cy="235" rx="90" ry="55" fill="rgba(255,255,255,0.18)" />
+            </g>
+            <rect width="600" height="400" rx="32" filter="url(#grain)" opacity="0.25" />
+          </svg>
+        `;
+        return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+      };
+
+      const menuItems = [
+        {
+          name: "Pão de queijo tigre",
+          description: "Bolinha macia de queijo meia-cura com toque de manteiga de garrafa.",
+          price: 8.5,
+          category: "Snacks",
+          image: createImageData("Pão de queijo tigre", "Snacks"),
+        },
+        {
+          name: "Coxinha de frango cremosa",
+          description: "Massa dourada, recheio de frango desfiado com requeijão leve.",
+          price: 12.0,
+          category: "Snacks",
+          image: createImageData("Coxinha de frango cremosa", "Snacks"),
+        },
+        {
+          name: "Bolinho de mandioca",
+          description: "Mandioca ralada com ervas frescas e queijo coalho.",
+          price: 10.5,
+          category: "Snacks",
+          image: createImageData("Bolinho de mandioca", "Snacks"),
+        },
+        {
+          name: "Pastel de palmito",
+          description: "Pastel assado com palmito pupunha e alho-poró.",
+          price: 11.0,
+          category: "Snacks",
+          image: createImageData("Pastel de palmito", "Snacks"),
+        },
+        {
+          name: "Empanadinha de milho",
+          description: "Massa crocante de milho com creme de legumes.",
+          price: 9.0,
+          category: "Snacks",
+          image: createImageData("Empanadinha de milho", "Snacks"),
+        },
+        {
+          name: "Tostada tropical",
+          description: "Pão rústico com creme de ricota, tomate e folhas.",
+          price: 14.0,
+          category: "Snacks",
+          image: createImageData("Tostada tropical", "Snacks"),
+        },
+        {
+          name: "Bolinhos de banana e canela",
+          description: "Massa fofinha com banana madura, canela e açúcar mascavo.",
+          price: 9.5,
+          category: "Snacks",
+          image: createImageData("Bolinhos de banana e canela", "Snacks"),
+        },
+        {
+          name: "Tábua de frutas frescas",
+          description: "Seleção do dia com manga, mamão, uva e melão.",
+          price: 18.0,
+          category: "Snacks",
+          image: createImageData("Tábua de frutas frescas", "Snacks"),
+        },
+        {
+          name: "Creme de abóbora",
+          description: "Sopa cremosa com abóbora cabotiá e toque de gengibre.",
+          price: 16.0,
+          category: "Hot",
+          image: createImageData("Creme de abóbora", "Hot"),
+        },
+        {
+          name: "Moqueca vegana",
+          description: "Legumes ao leite de coco com aroma de coentro fresco.",
+          price: 28.0,
+          category: "Hot",
+          image: createImageData("Moqueca vegana", "Hot"),
+        },
+        {
+          name: "Arroz de coco com legumes",
+          description: "Arroz soltinho com leite de coco e vegetais grelhados.",
+          price: 24.0,
+          category: "Hot",
+          image: createImageData("Arroz de coco com legumes", "Hot"),
+        },
+        {
+          name: "Escondidinho de mandioquinha",
+          description: "Purê de mandioquinha com recheio de cogumelos.",
+          price: 26.0,
+          category: "Hot",
+          image: createImageData("Escondidinho de mandioquinha", "Hot"),
+        },
+        {
+          name: "Feijoada leve do café",
+          description: "Feijão preto com legumes, servido com arroz e couve.",
+          price: 29.0,
+          category: "Hot",
+          image: createImageData("Feijoada leve do café", "Hot"),
+        },
+        {
+          name: "Frango grelhado com ervas",
+          description: "Peito de frango marinado com limão e ervas finas.",
+          price: 27.0,
+          category: "Hot",
+          image: createImageData("Frango grelhado com ervas", "Hot"),
+        },
+        {
+          name: "Bowl de quinoa brasileira",
+          description: "Quinoa com abóbora assada, espinafre e castanhas.",
+          price: 25.0,
+          category: "Hot",
+          image: createImageData("Bowl de quinoa brasileira", "Hot"),
+        },
+        {
+          name: "Lasanha de berinjela",
+          description: "Camadas de berinjela, molho de tomate e queijo gratinado.",
+          price: 30.0,
+          category: "Hot",
+          image: createImageData("Lasanha de berinjela", "Hot"),
+        },
+        {
+          name: "Risoto de milho e queijo coalho",
+          description: "Arroz cremoso com milho verde e queijo coalho tostado.",
+          price: 28.5,
+          category: "Hot",
+          image: createImageData("Risoto de milho e queijo coalho", "Hot"),
+        },
+        {
+          name: "Panqueca de espinafre",
+          description: "Panqueca verde com recheio de legumes e molho suave.",
+          price: 22.0,
+          category: "Hot",
+          image: createImageData("Panqueca de espinafre", "Hot"),
+        },
+        {
+          name: "Macarrão ao molho de tomate doce",
+          description: "Massa artesanal com tomate, manjericão e azeite.",
+          price: 23.0,
+          category: "Hot",
+          image: createImageData("Macarrão ao molho de tomate doce", "Hot"),
+        },
+        {
+          name: "Bobó de palmito",
+          description: "Creme de mandioca com palmito e temperos brasileiros.",
+          price: 27.5,
+          category: "Hot",
+          image: createImageData("Bobó de palmito", "Hot"),
+        },
+        {
+          name: "Café coado especial",
+          description: "Grãos selecionados, filtrados na hora com aroma intenso.",
+          price: 7.0,
+          category: "Drinks",
+          image: createImageData("Café coado especial", "Drinks"),
+        },
+        {
+          name: "Capuccino de canela",
+          description: "Espuma cremosa com canela e toque de chocolate.",
+          price: 12.5,
+          category: "Drinks",
+          image: createImageData("Capuccino de canela", "Drinks"),
+        },
+        {
+          name: "Café gelado com coco",
+          description: "Bebida gelada com café, leite vegetal e coco fresco.",
+          price: 13.0,
+          category: "Drinks",
+          image: createImageData("Café gelado com coco", "Drinks"),
+        },
+        {
+          name: "Suco de maracujá natural",
+          description: "Suco fresco e levemente adoçado com mel.",
+          price: 9.0,
+          category: "Drinks",
+          image: createImageData("Suco de maracujá natural", "Drinks"),
+        },
+        {
+          name: "Suco de acerola",
+          description: "Refrescante, rico em vitamina C e bem geladinho.",
+          price: 9.5,
+          category: "Drinks",
+          image: createImageData("Suco de acerola", "Drinks"),
+        },
+        {
+          name: "Limonada de capim-santo",
+          description: "Limonada aromática com capim-santo e hortelã.",
+          price: 10.0,
+          category: "Drinks",
+          image: createImageData("Limonada de capim-santo", "Drinks"),
+        },
+        {
+          name: "Chá mate gelado",
+          description: "Mate tostado com limão e especiarias suaves.",
+          price: 9.5,
+          category: "Drinks",
+          image: createImageData("Chá mate gelado", "Drinks"),
+        },
+        {
+          name: "Chocolate quente brasileiro",
+          description: "Cacau cremoso com leite e toque de noz-moscada.",
+          price: 11.5,
+          category: "Drinks",
+          image: createImageData("Chocolate quente brasileiro", "Drinks"),
+        },
+        {
+          name: "Smoothie de açaí e banana",
+          description: "Açaí batido com banana e granola crocante.",
+          price: 16.0,
+          category: "Drinks",
+          image: createImageData("Smoothie de açaí e banana", "Drinks"),
+        },
+        {
+          name: "Água de coco fresca",
+          description: "Servida gelada com coco verde recém-aberto.",
+          price: 8.0,
+          category: "Drinks",
+          image: createImageData("Água de coco fresca", "Drinks"),
+        },
+      ];
+
+      const menuList = document.getElementById("menu-list");
+      const cartCount = document.getElementById("cart-count");
+      const cartList = document.getElementById("cart-list");
+      const cartTotal = document.getElementById("cart-total");
+      const cartModal = document.getElementById("cart-modal");
+      const reservationModal = document.getElementById("reservation-modal");
+      const reservationResult = document.getElementById("reservation-result");
+      const orderResult = document.getElementById("order-result");
+      const tableSelect = document.getElementById("table-select");
+
+      const cart = new Map();
+
+      const formatPrice = (value) =>
+        value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+      const renderMenu = () => {
+        menuList.innerHTML = "";
+        menuItems.forEach((item, index) => {
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `
+            <h3>${item.name}</h3>
+            <img src="${item.image}" alt="${item.name}" />
+            <p>${item.description}</p>
+            <div class="card-footer">
+              <span class="price">${formatPrice(item.price)}</span>
+              <button class="add-btn" data-index="${index}">Adicionar</button>
+            </div>
+          `;
+          menuList.appendChild(card);
+        });
+      };
+
+      const updateCart = () => {
+        let count = 0;
+        let total = 0;
+        cartList.innerHTML = "";
+        cart.forEach((quantity, index) => {
+          const item = menuItems[index];
+          count += quantity;
+          total += item.price * quantity;
+          const row = document.createElement("div");
+          row.className = "cart-item";
+          row.innerHTML = `
+            <span>${item.name} x${quantity}</span>
+            <span>${formatPrice(item.price * quantity)}</span>
+          `;
+          cartList.appendChild(row);
+        });
+        if (count === 0) {
+          cartList.innerHTML = "<p>Seu carrinho está vazio.</p>";
+        }
+        cartCount.textContent = count;
+        cartTotal.textContent = formatPrice(total);
+      };
+
+      const toggleModal = (modal, isOpen) => {
+        modal.classList.toggle("active", isOpen);
+        modal.setAttribute("aria-hidden", String(!isOpen));
+      };
+
+      menuList.addEventListener("click", (event) => {
+        const button = event.target.closest(".add-btn");
+        if (!button) return;
+        const index = Number(button.dataset.index);
+        cart.set(index, (cart.get(index) || 0) + 1);
+        updateCart();
+      });
+
+      document.getElementById("floating-cart").addEventListener("click", () => {
+        toggleModal(cartModal, true);
+      });
+
+      document.getElementById("open-cart-top").addEventListener("click", () => {
+        toggleModal(cartModal, true);
+      });
+
+      document.getElementById("open-reservation").addEventListener("click", () => {
+        toggleModal(reservationModal, true);
+      });
+
+      document.querySelectorAll("[data-close]").forEach((button) => {
+        button.addEventListener("click", () => {
+          toggleModal(document.getElementById(button.dataset.close), false);
+        });
+      });
+
+      document.getElementById("place-order").addEventListener("click", () => {
+        const table = tableSelect.value;
+        if (cart.size === 0) {
+          orderResult.hidden = false;
+          orderResult.textContent = "Adicione itens no carrinho antes de finalizar.";
+          return;
+        }
+        orderResult.hidden = false;
+        orderResult.textContent = `Pedido enviado para a mesa ${table}! Em breve levaremos seus pratos.`;
+      });
+
+      document.getElementById("confirm-reservation").addEventListener("click", () => {
+        const date = document.getElementById("reservation-date").value;
+        const time = document.getElementById("reservation-time").value;
+        if (!date || !time) {
+          reservationResult.hidden = false;
+          reservationResult.textContent = "Informe a data e o horário da reserva.";
+          return;
+        }
+        const reservationNumber = Math.floor(Math.random() * 9000) + 1000;
+        reservationResult.hidden = false;
+        reservationResult.textContent = `Reserva confirmada! Seu número é #${reservationNumber}.`;
+      });
+
+      const initTableSelect = () => {
+        for (let i = 1; i <= 15; i += 1) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.textContent = `Mesa ${i}`;
+          tableSelect.appendChild(option);
+        }
+      };
+
+      renderMenu();
+      initTableSelect();
+      updateCart();
+    </script>
+  </body>
+</html>
